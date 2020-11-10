@@ -1,33 +1,14 @@
-FROM openjdk:8-jre
+FROM nginx:mainline
 
-MAINTAINER Michael Staehler <michael.staehler.ext@dkv-mobility.com>
+# support running as arbitrary user which belogs to the root group
+RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
 
-ENV ACTIVEMQ_VERSION=5.15.2 \
-    POSTGRES_JDBC_DRIVER_VERSION=9.4.1212 \
-    ACTIVEMQ_TCP=61616 \
-    ACTIVEMQ_HOME=/opt/activemq
+# users are not allowed to listen on priviliged ports
+RUN sed -i.bak 's/listen\(.*\)80;/listen 8081;/' /etc/nginx/conf.d/default.conf
+EXPOSE 8081
 
-ENV ACTIVEMQ=apache-activemq-$ACTIVEMQ_VERSION    
+# comment user directive as master process is run as user in OpenShift anyhow
+RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 
-COPY files/docker-entrypoint.sh /docker-entrypoint.sh
-
-RUN set -x && \
-    curl -s -S https://archive.apache.org/dist/activemq/$ACTIVEMQ_VERSION/$ACTIVEMQ-bin.tar.gz | tar xvz -C /opt && \
-    ln -s /opt/$ACTIVEMQ $ACTIVEMQ_HOME && \
-    cd $ACTIVEMQ_HOME/lib/optional && \
-    curl -O https://jdbc.postgresql.org/download/postgresql-$POSTGRES_JDBC_DRIVER_VERSION.jar && \
-	sed -i "s/mqtt/http/g" /opt/activemq/conf/activemq.xml && \
-	sed -i "s/1883/8080/g" /opt/activemq/conf/activemq.xml && \	
-    useradd -r -M -d $ACTIVEMQ_HOME activemq && \	
-    chown -R :0 /opt/$ACTIVEMQ && \
-    chown -h :0 $ACTIVEMQ_HOME && \
-    chmod go+rwX -R $ACTIVEMQ_HOME && \
-    chmod +x /docker-entrypoint.sh
-
-WORKDIR $ACTIVEMQ_HOME
-
-EXPOSE 61616
-EXPOSE 8161
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["/bin/sh", "-c", "bin/activemq console"]
+RUN addgroup nginx root
+USER nginx
