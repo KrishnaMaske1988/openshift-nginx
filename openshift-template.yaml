@@ -39,7 +39,7 @@ objects:
           imagePullPolicy: Always
           name: openshift-nginx
           ports:
-          - containerPort: 8081
+          - containerPort: 8082
             protocol: TCP          
           resources: {}
           terminationMessagePath: /dev/termination-log
@@ -111,9 +111,9 @@ objects:
   spec:
     ports:
     - name: http
-      port: 8081
+      port: 8082
       protocol: TCP
-      targetPort: 8081
+      targetPort: 8082
     selector:
       app: openshift-nginx
       deploymentconfig: openshift-nginx
@@ -127,7 +127,7 @@ objects:
     name: nginx
   spec:
     port:
-      targetPort: 8081
+      targetPort: 8082
     tls:
       insecureEdgeTerminationPolicy: Redirect
       termination: edge
