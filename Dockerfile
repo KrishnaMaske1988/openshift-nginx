@@ -1,4 +1,4 @@
-FROM nginx:stable
+FROM nginx:alpine
 
 # support running as arbitrary user which belogs to the root group
 RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
@@ -8,5 +8,4 @@ RUN sed -i "/#tcp_nopush/i server {\nlisten [::]:8081; \naccess_log /var/log/ngi
 EXPOSE 8081
 # comment user directive as master process is run as user in OpenShift anyhow
 RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
