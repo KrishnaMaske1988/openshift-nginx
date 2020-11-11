@@ -12,7 +12,7 @@ EXPOSE 8082
 # comment user directive as master process is run as user in OpenShift anyhow
 RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 
-RUN sed -i "/#tcp_nopush/i server {\nlisten 8080;\nlisten [::]:8082; \naccess_log /var/log/nginx/reverse-access.log;\n error_log /var/log/nginx/reverse-error.log;\nlocation / {\n proxy_pass openshift-activemq; \n} \n}" /etc/nginx/nginx.conf
+RUN sed -i "/#tcp_nopush/i server {\nlisten 8080;\nlisten [::]:8082; \naccess_log /var/log/nginx/reverse-access.log;\n error_log /var/log/nginx/reverse-error.log;\nlocation / {\n proxy_pass http://openshift-activemq:61616; \n} \n}" /etc/nginx/nginx.conf
 
 RUN addgroup nginx root
 
