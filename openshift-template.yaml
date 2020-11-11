@@ -106,8 +106,8 @@ objects:
   kind: Service
   metadata:
     labels:
-      app: openshift-activemq
-    name: openshift-activemq
+      app: openshift-nginx
+    name: openshift-nginx
   spec:
     ports:
     - name: http
