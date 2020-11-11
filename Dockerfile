@@ -8,13 +8,10 @@ RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 
 RUN sed -i "/#tcp_nopush/i server {\nlisten 8080;\nlisten [::]:8082 ipv6only=on; \naccess_log /var/log/nginx/reverse-access.log;\n error_log /var/log/nginx/reverse-error.log;\nlocation / {\n proxy_pass http://api.ocp4.innershift.sodigital.io:8080;\n}\n}" /etc/nginx/nginx.conf
 
-RUN sed -i.bak 's/listen\(.*\)80;/listen 8081;/' /etc/nginx/conf.d/default.conf
-EXPOSE 8081
+# users are not allowed to listen on priviliged ports
+RUN sed -i.bak 's/listen\(.*\)80;/listen 8082;/' /etc/nginx/conf.d/default.conf
+EXPOSE 8082
 
 RUN addgroup nginx root
 
 USER nginx
-
-# users are not allowed to listen on priviliged ports
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
